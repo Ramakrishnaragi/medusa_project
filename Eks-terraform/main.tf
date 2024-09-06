@@ -104,8 +104,8 @@ resource "aws_ecs_service" "medusa_service" {
   }
 }
 
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecsTaskExecutionRole"
+resource "aws_iam_role" "ecs_task_role" {
+  name = "ecsTaskRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"

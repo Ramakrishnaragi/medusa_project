@@ -106,11 +106,10 @@ resource "aws_ecs_service" "medusa_service" {
 
 
 
-
 # IAM Role for ECS Task Execution
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
-
+  
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -125,32 +124,30 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   })
 }
 
-# IAM Role for ECS Task
-resource "aws_iam_role" "ecs_task_role" {
-  name = "ecsTaskRole"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-      },
-    ]
-  })
-}
-
-# Attach ECS Task Execution Policy to the Execution Role
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# Attach ECS Task Policy to the Task Role
+# IAM Role for ECS Task
+resource "aws_iam_role" "ecs_task_role" {
+  name = "ecsTaskRole"
+  
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "ecs_task_policy" {
   role       = aws_iam_role.ecs_task_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonECSTaskExecutionRolePolicy"  # Confirm the correct policy ARN
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"  # Update this with the correct policy for your needs
 }

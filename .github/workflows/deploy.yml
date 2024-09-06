@@ -43,7 +43,8 @@ jobs:
       id: ecr_login
       uses: aws-actions/amazon-ecr-login@v1
       with:
-        region: us-east-1 
+        region: us-east-1
+        mask-password: 'false'
       
     - name: Build the Docker image
       run: |

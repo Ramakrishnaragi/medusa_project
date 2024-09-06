@@ -1,3 +1,4 @@
+
 # Create a VPC
 resource "aws_vpc" "medusa_vpc" {
   cidr_block = "10.0.0.0/16"
@@ -121,9 +122,9 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_task_policy" {
-  role       = aws_iam_role.ecs_task_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonECSTaskRolePolicy"  # Update this with the correct policy for your needs
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 # IAM Role for ECS Task
@@ -146,5 +147,5 @@ resource "aws_iam_role" "ecs_task_role" {
 
 resource "aws_iam_role_policy_attachment" "ecs_task_policy" {
   role       = aws_iam_role.ecs_task_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonECSTaskExecutionRolePolicy"  # Update this with the correct policy for your needs
+  policy_arn = "arn:aws:iam::aws:policy/AmazonECSTaskRolePolicy"  # Update this with the correct policy for your needs
 }

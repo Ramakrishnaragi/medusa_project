@@ -1,7 +1,7 @@
-name: Destroy AWS ECS Infrastructure
+name: Destroy AWS Infrastructure and Docker Resources
 
 on:
-  workflow_dispatch:  # Allows manual trigger from the GitHub Actions UI
+  workflow_dispatch:  # Allows manual trigger from GitHub Actions UI
 
 jobs:
   destroy:
@@ -9,7 +9,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    
+
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v1
       with:
@@ -25,3 +25,22 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       working-directory: ./Eks-terraform
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Remove Docker images
+      run: |
+        docker rmi -f medusa-backend:latest
+        docker rmi -f 207268090422.dkr.ecr.us-east-1.amazonaws.com/medusa-backend:latest || true
+
+    - name: Remove Docker containers
+      run: |
+        docker ps -a -q | xargs docker rm -f || true
+
+    - name: Remove Docker volumes
+      run: |
+        docker volume ls -q | xargs docker volume rm || true

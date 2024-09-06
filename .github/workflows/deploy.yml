@@ -19,6 +19,7 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
+      working-directory: ./Eks-terraform
 
     - name: Terraform Apply
       run: terraform apply -auto-approve

@@ -22,9 +22,9 @@ jobs:
         terraform init
       working-directory: ./Eks-terraform
     
-    - name: Terraform plan
-      run: |
-        terraform plan
+    #- name: Terraform plan
+     # run: |
+     #   terraform plan
     
     - name: Terraform validate
       run: |

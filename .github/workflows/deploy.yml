@@ -37,7 +37,7 @@ jobs:
       
     - name: Build the Docker image
       run: |
-        docker build -t medusa-backend .
+        docker build -t my-image:latest -f Dockerfile .
         docker tag medusa-backend:latest 207268090422.dkr.ecr.us-east-1.amazonaws.com/medusa-backend:latest
 
     - name: Push the Docker image to ECR

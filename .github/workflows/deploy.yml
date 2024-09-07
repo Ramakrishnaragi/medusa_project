@@ -39,12 +39,28 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       working-directory: ./Eks-terraform
 
+    # - name: Log in to Amazon ECR
+    #   id: ecr_login
+    #   uses: aws-actions/amazon-ecr-login@v1
+    #   with:
+    #     region: us-east-1
+      
+
     - name: Log in to Amazon ECR
       id: ecr_login
       uses: aws-actions/amazon-ecr-login@v1
       with:
-        region: us-east-1
-      
+        mask-password: false
+        registry-type: private
+        skip-logout: false
+      env:
+        AWS_REGION: us-east-1 # Ensure your environment has the correct region
+        TERRAFORM_CLI_PATH: /home/runner/work/_temp/d747af65-d62e-4200-b1eb-3693991067e9
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: us-east-1
+
+
     - name: Build the Docker image
       run: |
         docker build -t my-image:latest -f Dockerfile .

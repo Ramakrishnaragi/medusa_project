@@ -2,9 +2,9 @@ FROM node:16.20.1
 
 WORKDIR /app
 
-COPY package.json ./
+COPY package*.json ./
 
-RUN npm install
+RUN npm install && npm install -g @medusajs/medusa-cli@latest
 
 COPY . .
 

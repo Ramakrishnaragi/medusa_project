@@ -1,4 +1,4 @@
-name: Deploy to AWS ECS
+name: Deploy Medusa to AWS ECS
 
 on:
   push:
@@ -6,69 +6,63 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: 207268090422.dkr.ecr.us-east-1.amazonaws.com/medusa-backend
+  ECS_CLUSTER: medusa-cluster
+  ECS_SERVICE: medusa-service
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v2
-    
+
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v1
       with:
-        terraform_version: 1.0.0
+        terraform_version: 1.6.0
 
     - name: Terraform Init
-      run: |
-        terraform init
+      run: terraform init
       working-directory: ./Eks-terraform
-    
-    #- name: Terraform plan
-     # run: |
-     #   terraform plan
-    
-    - name: Terraform validate
-      run: |
-        terraform validate
+
+    - name: Terraform Validate
+      run: terraform validate
       working-directory: ./Eks-terraform
 
     - name: Terraform Apply
-      run: |
-        terraform apply -auto-approve
+      run: terraform apply -auto-approve
+      working-directory: ./Eks-terraform
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      working-directory: ./Eks-terraform
 
-    # - name: Log in to Amazon ECR
-    #   id: ecr_login
-    #   uses: aws-actions/amazon-ecr-login@v1
-    #   with:
-    #     region: us-east-1
-      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
 
     - name: Log in to Amazon ECR
-      id: ecr_login
       uses: aws-actions/amazon-ecr-login@v1
-      with:
-        mask-password: false
-        registry-type: private
-        skip-logout: false
-      env:
-        AWS_REGION: us-east-1 # Ensure your environment has the correct region
-        TERRAFORM_CLI_PATH: /home/runner/work/_temp/d747af65-d62e-4200-b1eb-3693991067e9
-        AWS_DEFAULT_REGION: us-east-1
 
-
-    - name: Build the Docker image
+    - name: Build and Tag Docker Image
       run: |
-        docker build -t my-image:latest -f Dockerfile .
-        docker tag medusa-backend:latest 207268090422.dkr.ecr.us-east-1.amazonaws.com/medusa-backend:latest
+        docker build -t medusa-backend:latest .
+        docker tag medusa-backend:latest $ECR_REPOSITORY:latest
 
-    - name: Push the Docker image to ECR
+    - name: Push Docker Image to ECR
       run: |
-        docker push 207268090422.dkr.ecr.us-east-1.amazonaws.com/medusa-backend:latest
+        docker push $ECR_REPOSITORY:latest
 
-    - name: Update ECS Service
+    - name: Deploy Updated Image to ECS
       run: |
-        aws ecs update-service --cluster medusa-cluster --service medusa-service --force-new-deployment --region us-east-1
+        aws ecs update-service \
+          --cluster $ECS_CLUSTER \
+          --service $ECS_SERVICE \
+          --force-new-deployment \
+          --region $AWS_REGION

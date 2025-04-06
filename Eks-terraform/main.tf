@@ -61,7 +61,7 @@ resource "aws_ecs_cluster" "medusa_cluster" {
 resource "aws_ecr_repository" "medusa_repo" {
   name = "medusa-backend"
   lifecycle {
-    prevent_destroy = true
+    ignore_changes  = all
   }
 }
 

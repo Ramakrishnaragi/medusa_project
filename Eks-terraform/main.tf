@@ -57,7 +57,9 @@ resource "aws_ecs_cluster" "medusa_cluster" {
   name = "medusa-cluster"
 }
 
-
+resource "aws_ecr_repository" "medusa_repo" {
+  name = "medusa-backend"
+}
 
 # ECS Task Definition for Fargate
 resource "aws_ecs_task_definition" "medusa_task" {

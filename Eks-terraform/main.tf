@@ -57,13 +57,7 @@ resource "aws_ecs_cluster" "medusa_cluster" {
   name = "medusa-cluster"
 }
 
-# Create an ECR repository to store the Docker image
-resource "aws_ecr_repository" "medusa_repo" {
-  name = "medusa-backend"
-  lifecycle {
-    ignore_changes  = all
-  }
-}
+
 
 # ECS Task Definition for Fargate
 resource "aws_ecs_task_definition" "medusa_task" {

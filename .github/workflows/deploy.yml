@@ -48,26 +48,25 @@ jobs:
       
 
     - name: Log in to Amazon ECR
-      id: ecr_login
-      uses: aws-actions/amazon-ecr-login@v1
-      with:
-        mask-password: false
-        registry-type: private
-        skip-logout: false
+      run: |
+        aws ecr get-login-password --region us-east-1 | \
+        docker login --username AWS --password-stdin 913524910759.dkr.ecr.us-east-1.amazonaws.com
       env:
-        AWS_REGION: us-east-1 # Ensure your environment has the correct region
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: us-east-1
         TERRAFORM_CLI_PATH: /home/runner/work/_temp/d747af65-d62e-4200-b1eb-3693991067e9
-        AWS_DEFAULT_REGION: us-east-1
 
-
-    - name: Build the Docker image
+    - name: Build and Tag Docker image
       run: |
         docker build -t my-image:latest -f Dockerfile .
-        docker tag medusa-backend:latest 207268090422.dkr.ecr.us-east-1.amazonaws.com/medusa-backend:latest
+        docker build -t medusa-backend .
+        docker tag medusa-backend:latest 913524910759.dkr.ecr.us-east-1.amazonaws.com/medusa-backend:latest
+
 
     - name: Push the Docker image to ECR
       run: |
-        docker push 207268090422.dkr.ecr.us-east-1.amazonaws.com/medusa-backend:latest
+        docker push 913524910759.dkr.ecr.us-east-1.amazonaws.com/medusa-backend:latest
 
     - name: Update ECS Service
       run: |
